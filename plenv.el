@@ -102,7 +102,9 @@
     (plenv-try-load-from-file version plenv-version-file)
     version))
 
-(defun guess-plenv-version (pwd)
+(defun guess-plenv-version (&optional pwd)
+  (if (null pwd)
+      (setq pwd default-directory))
   (let ((version (getenv "PLENV_VERSION"))) ;; shell version
     (if (null version) ;; local version
         (setq version (try-get-plenv-local-version pwd)))
@@ -112,7 +114,7 @@
         (setq version (shell-command-to-string (plenv-command '("version")))))
     version))
 
-(defun guess-plenv-perl-path (pwd)
+(defun guess-plenv-perl-path (&optional pwd)
   (if (null pwd)
       (setq pwd default-directory))
   (let ((version (guess-plenv-version pwd)))
@@ -157,7 +159,7 @@
 
 (defun plenv-version ()
   (interactive)
-  (message "version: %s" (guess-plenv-version default-directory)))
+  (message "version: %s" (guess-plenv-version)))
 
 (provide 'plenv)
 
