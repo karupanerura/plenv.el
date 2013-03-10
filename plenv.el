@@ -30,7 +30,7 @@
 ;; Below are customizable option list:
 ;;
 ;; `plenv-dir'
-;; your perlbrew directory
+;; your plenv directory
 ;; default = ~/.plenv
 
 ;;; Utility
