@@ -33,6 +33,10 @@
 ;; your perlbrew directory
 ;; default = ~/.plenv
 
+;;; Utility
+;; (guess-plenv-perl-path)    ;; return current plenv perl path. (like "plenv which perl". but, implemented by elisp.)
+;; (guess-plenv-perl-version) ;; return current plenv perl version. (like "plenv version". but, implemented by elisp.)
+
 ;;; Code:
 (require 'cl)
 
@@ -50,6 +54,13 @@
 (defvar plenv-current-perl-dir nil)
 (defvar plenv-current-perl-path nil)
 
+(defvar plenv-global-perl-path (let ((curr-plenv-version-env (getenv "PLENV_VERSION"))
+                                     (result))
+                                 (setenv "PLENV_VERSION" "system")
+                                 (setq result (shell-command-to-string "plenv which perl"))
+                                 (setenv "PLENV_VERSION" curr-plenv-version-env)
+                                 result))
+
 (defmacro plenv-trim (str)
   `(replace-regexp-in-string "\n+$" "" ,str))
 
@@ -59,6 +70,14 @@
 (defmacro plenv-command (args)
   `(plenv-join " " (cons "plenv" ,args)))
 
+(defmacro plenv-basedir (curr-dir)
+  `(plenv-join "/" (nreverse (cdr (nreverse (split-string ,curr-dir "/"))))))
+
+(defmacro plenv-try-load-from-file (varname file)
+  `(if (file-readable-p ,file)
+       (setq ,varname (with-temp-buffer
+                        (insert-file-contents ,file)
+                        (buffer-string)))))
 (defun plenv-perls ()
   (let* ((perls (split-string (plenv "list")))
           (valid-perls (remove-if-not
@@ -66,6 +85,39 @@
                          (string-match "^\\(perl\\|[0-9]\\)" i))
                        perls)))
     (append valid-perls (list "system"))))
+
+(defun try-get-plenv-local-version (pwd)
+  (unless (or (null pwd) (string= "" pwd) (string= "/" pwd) (string= "." pwd))
+      (let ((plenv-version-file (concat pwd "/.perl-version"))
+            (version nil))
+        (plenv-try-load-from-file version plenv-version-file)
+        (if (null version)
+            (try-get-plenv-local-version (plenv-basedir pwd))
+          version)))
+  nil)
+
+(defun try-get-plenv-global-version ()
+  (let ((plenv-version-file (concat plenv-dir "/version"))
+        (version nil))
+    (plenv-try-load-from-file version plenv-version-file)
+    version))
+
+(defun guess-plenv-version (pwd)
+  (let ((version (getenv "PLENV_VERSION"))) ;; shell version
+    (if (null version) ;; local version
+        (setq version (try-get-plenv-local-version pwd)))
+    (if (null version) ;; global version
+        (setq version (try-get-plenv-global-version)))
+    (if (null version) ;; fallback to command
+        (setq version (shell-command-to-string (plenv-command '("version")))))
+    version))
+
+(defun guess-plenv-perl-path (pwd)
+  (if (null pwd)
+      (setq pwd default-directory))
+  (let ((version (guess-plenv-version pwd)))
+    (cond ((string= "system" version) plenv-global-perl-path)
+          (t (format "%s/versions/%s/bin/perl%s" plenv-dir version version)))))
 
 (defun plenv (args)
   (interactive "M$ plenv ")
@@ -102,6 +154,10 @@
     (unless (member version (plenv-perls))
       (error "Not installed version: %s" version)))
   (shell-command (plenv-command (list "global" version))))
+
+(defun plenv-version ()
+  (interactive)
+  (message "version: %s" (guess-plenv-version default-directory)))
 
 (provide 'plenv)
 
