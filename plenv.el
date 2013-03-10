@@ -3,7 +3,7 @@
 ;; Copyright (C) 2012 Kenta Sato
 
 ;; Author: Kenta Sato <karupa@cpan.org>
-;; Version: 0.2
+;; Version: 0.21
 ;; Keywords: Emacs, Perl
 
 ;; This program is free software; you can redistribute it and/or modify

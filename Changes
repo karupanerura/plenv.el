@@ -6,3 +6,6 @@ Revision history for Emacs extension plenv.el
 0.2 2013-03-11
     - added utility functions. (guess-plenv-version, guess-plenv-perl-path)
     - added plenv-version command.
+
+0.21 2013-03-11
+    - fixed interface.
