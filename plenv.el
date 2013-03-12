@@ -57,7 +57,7 @@
 (defvar plenv-global-perl-path (let ((curr-plenv-version-env (getenv "PLENV_VERSION"))
                                      (result))
                                  (setenv "PLENV_VERSION" "system")
-                                 (setq result (shell-command-to-string "plenv which perl"))
+                                 (setq result (plenv-trim (shell-command-to-string "plenv which perl")))
                                  (setenv "PLENV_VERSION" curr-plenv-version-env)
                                  result))
 
@@ -110,7 +110,7 @@
     (if (null version) ;; global version
         (setq version (try-get-plenv-global-version)))
     (if (null version) ;; fallback to command
-        (setq version (shell-command-to-string (plenv-command '("version")))))
+        (setq version (plenv-trim (shell-command-to-string (plenv-command '("version")))))
     version))
 
 (defun guess-plenv-perl-path (&optional pwd)
