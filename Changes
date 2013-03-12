@@ -9,3 +9,6 @@ Revision history for Emacs extension plenv.el
 
 0.21 2013-03-11
     - fixed interface.
+
+0.22 2013-03-12
+    - fixed bug. system perl's path contained "\n".
