@@ -14,12 +14,6 @@ In your .emacs.d/init.el:
     (require 'plenv) ;; for guess-plenv-perl-path
     (require 'flymake)
 
-    (defconst flymake-allowed-perl-file-name-masks
-      '(("\\.pl$"    flymake-perl-init)
-        ("\\.pm$"   flymake-perl-init)
-        ("\\.psgi$" flymake-perl-init)
-        ("\\.t$"    flymake-perl-init)))
-
     (defun flymake-perl-init ()
       (let* ((temp-file (flymake-init-create-temp-buffer-copy
                          'flymake-create-temp-with-folder-structure))
@@ -27,6 +21,11 @@ In your .emacs.d/init.el:
                           temp-file
                           (file-name-directory buffer-file-name))))
         (list (guess-plenv-perl-path) (list "-wc" local-file))))
+
+    (push '(".+\\.p[ml]$" flymake-perl-init) flymake-allowed-file-name-masks)
+    (push '(".+\\.psgi$" flymake-perl-init) flymake-allowed-file-name-masks)
+    (push '(".+\\.t$" flymake-perl-init) flymake-allowed-file-name-masks)
+
 
 Commands
 ========
