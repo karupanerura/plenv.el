@@ -64,6 +64,14 @@
                                  (setenv "PLENV_VERSION" curr-plenv-version-env)
                                  result))
 
+(defvar plenv-script-version
+  (car (cdr (split-string (plenv-trim (shell-command-to-string "plenv --version")) " "))))
+
+(defvar plenv-script-major-version
+  (string-to-number (substring (replace-regexp-in-string "^v" "" plenv-script-version) 0 3)))
+
+(defvar plenv-list-subcommand (if (<= 1.9 plenv-script-major-version) "versions" "list"))
+
 (defmacro plenv-join (delimiter string-list)
   `(mapconcat 'identity ,string-list ,delimiter))
 
@@ -79,12 +87,17 @@
                         (insert-file-contents ,file)
                         (buffer-string)))))
 (defun plenv-perls ()
-  (let* ((perls (split-string (plenv "list")))
-          (valid-perls (remove-if-not
-                       (lambda (i)
-                         (string-match "^\\(perl\\|[0-9]\\)" i))
-                       perls)))
-    (append valid-perls (list "system"))))
+  (let* ((perls (split-string (plenv plenv-list-subcommand)))
+          (valid-perls (mapcar
+                         (lambda (i)
+                           (replace-regexp-in-string " (set by\.\*\$" "" i))
+                       (remove-if-not
+                         (lambda (i)
+                           (string-match "^\\(perl\\|[0-9]\\)" i))
+                       perls))))
+    (if (string-equal plenv-list-subcommand "list")
+        (append valid-perls (list "system")))
+    valid-perls))
 
 (defun try-get-plenv-local-version (pwd)
   (unless (or (null pwd) (string= "" pwd) (string= "/" pwd) (string= "." pwd))
@@ -130,7 +143,7 @@
 
 (defun plenv-list ()
   (interactive)
-  (shell-command (plenv-command '("list"))))
+  (shell-command (plenv-command (list plenv-list-subcommand))))
 
 (defun plenv-shell (version)
   (interactive (list (completing-read "Version: " (plenv-perls) nil t)))
