@@ -8,7 +8,11 @@ Revision history for Emacs extension plenv.el
     - added plenv-version command.
 
 0.21 2013-03-11
-    - fixed interface.
+    - fixed interfaces.
 
 0.22 2013-03-12
-    - fixed bug. system perl's path contained "\n".
+    - fixed a bug. system perl's path contained "\n".
+
+0.3 2013-06-15
+    - fixed a bug. broken guess-plenv-perl-path in the case using a --as option of the plenv(perl-build). (thank for taiyoh)
+    - support to the interface of the rbenv based plenv.(over version 1.9)
