@@ -86,6 +86,7 @@
        (setq ,varname (with-temp-buffer
                         (insert-file-contents ,file)
                         (buffer-string)))))
+
 (defun plenv-perls ()
   (let* ((perls (split-string (plenv plenv-list-subcommand)))
           (valid-perls (mapcar
@@ -96,7 +97,7 @@
                            (string-match "^\\(perl\\|[0-9]\\)" i))
                        perls))))
     (if (string-equal plenv-list-subcommand "list")
-        (append valid-perls (list "system")))
+        (setq valid-perls (append valid-perls (list "system"))))
     valid-perls))
 
 (defun try-get-plenv-local-version (pwd)
