@@ -118,7 +118,7 @@
       (setq pwd default-directory))
   (let ((version (guess-plenv-version pwd)))
     (cond ((string= "system" version) plenv-global-perl-path)
-          (t (format "%s/versions/%s/bin/perl%s" plenv-dir version version)))))
+          (t (format "%s/versions/%s/bin/perl" plenv-dir version)))))
 
 (defun plenv (args)
   (interactive "M$ plenv ")
