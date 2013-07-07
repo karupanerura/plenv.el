@@ -85,7 +85,7 @@
   `(if (file-readable-p ,file)
        (setq ,varname (with-temp-buffer
                         (insert-file-contents ,file)
-                        (buffer-string)))))
+                        (plenv-trim (buffer-string))))))
 
 (defun plenv-perls ()
   (let* ((perls (split-string (plenv plenv-list-subcommand)))
