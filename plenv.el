@@ -134,6 +134,7 @@
     (cond ((string= "system" version) plenv-global-perl-path)
           (t (format "%s/versions/%s/bin/perl" plenv-dir version)))))
 
+;;;###autoload
 (defun plenv (args)
   (interactive "M$ plenv ")
   (let* ((command (plenv-command (list args)))
@@ -142,10 +143,12 @@
         (unless (string-match "^\\s*$" result) (message result))
       result)))
 
+;;;###autoload
 (defun plenv-list ()
   (interactive)
   (shell-command (plenv-command (list plenv-list-subcommand))))
 
+;;;###autoload
 (defun plenv-shell (version)
   (interactive (list (completing-read "Version: " (plenv-perls) nil t)))
   (setq plenv-versions-dir (concat plenv-dir "/versions"))
@@ -154,6 +157,7 @@
       (error "Not installed version: %s" version)))
   (setenv "PLENV_VERSION" version))
 
+;;;###autoload
 (defun plenv-local (version)
   (interactive (list (completing-read "Version: " (plenv-perls) nil t)))
   (setq plenv-versions-dir (concat plenv-dir "/versions"))
@@ -162,6 +166,7 @@
       (error "Not installed version: %s" version)))
   (shell-command (plenv-command (list "local" version))))
 
+;;;###autoload
 (defun plenv-global (version)
   (interactive (list (completing-read "Version: " (plenv-perls) nil t)))
   (setq plenv-versions-dir (concat plenv-dir "/versions"))
@@ -170,6 +175,7 @@
       (error "Not installed version: %s" version)))
   (shell-command (plenv-command (list "global" version))))
 
+;;;###autoload
 (defun plenv-version ()
   (interactive)
   (message "version: %s" (guess-plenv-version)))
